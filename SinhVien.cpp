@@ -6,28 +6,88 @@ using namespace std;
 // Nhập thông tin sinh viên
 SinhVien nhapSinhVien() {
     SinhVien sv;
-    //  Nhập mã, tên, số tiền
+
+    cout << "Nhap ma SV: ";
+    getline(cin, sv.maSV);
+
+    cout << "Nhap ten SV: ";
+    getline(cin, sv.tenSV);
+
+    cout << "Nhap hoc phi: ";
+    cin >> sv.hocPhi;
+    cin.ignore();
+
+    sv.next = nullptr;
     return sv;
 }
 
-// In thông tin sinh viên
+// In thông tin 
 void inSinhVien(const SinhVien& sv) {
-    // In ra console: maSV, tenSV, hocPhi
+    cout << "Ma SV: " << sv.maSV << endl;
+    cout << "Ten SV: " << sv.tenSV << endl;
+    cout << "Hoc phi: " << sv.hocPhi << endl;
+    cout << "------------------" << endl;
 }
 
-// Lưu danh sách sinh viên vào file
+// Lưu danh sách
 void luuFileSinhVien(SinhVien* head, const string& filename) {
-    //Duyệt danh sách, ghi vào file
+    ofstream out(filename);
+
+    SinhVien* p = head;
+    while (p != nullptr) {
+        out << p->maSV << endl;
+        out << p->tenSV << endl;
+        out << p->hocPhi << endl;
+        p = p->next;
+    }
+
+    out.close();
 }
 
-// Đọc danh sách sinh viên từ file
+// Đọc danh sách
 SinhVien* docFileSinhVien(const string& filename) {
-    //Đọc file, tạo linked list, trả về head
-    return nullptr;
+    ifstream in(filename);
+
+    SinhVien* head = nullptr;
+    SinhVien* tail = nullptr;
+
+    while (true) {
+        SinhVien* sv = new SinhVien;
+
+        getline(in, sv->maSV);
+        if (sv->maSV == "") {
+            delete sv;
+            break;
+        }
+
+        getline(in, sv->tenSV);
+        in >> sv->hocPhi;
+        in.ignore();
+
+        sv->next = nullptr;
+
+        if (head == nullptr) {
+            head = tail = sv;
+        } else {
+            tail->next = sv;
+            tail = sv;
+        }
+    }
+
+    in.close();
+    return head;
 }
 
 // Tìm sinh viên theo tên
 SinhVien* timTheoTen(SinhVien* head, const string& ten) {
-    //Duyệt danh sách, trả về node đầu tiên khớp
+    SinhVien* p = head;
+
+    while (p != nullptr) {
+        if (p->tenSV.find(ten) != string::npos) {
+            return p;
+        }
+        p = p->next;
+    }
+
     return nullptr;
 }
