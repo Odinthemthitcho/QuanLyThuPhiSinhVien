@@ -9,6 +9,7 @@ struct StackNode {
 };
 
 class Stack {
+
 private:
     StackNode* top; // Node đỉnh của stack
 
