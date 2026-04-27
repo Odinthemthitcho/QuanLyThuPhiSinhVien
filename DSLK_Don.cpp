@@ -1,17 +1,15 @@
 #include "DSLK_Don.h"
 #include <iostream>
 #include <fstream>
-#include <string>
-#include "SinhVien.h"
-
+#include <limits>
 using namespace std;
 
-// Khởi tạo danh sách rỗng
+// Khởi tạo
 void DSLK_Don::init() {
     head = nullptr;
 }
 
-// Tạo node mới
+// Tạo node
 NodeSinhVien* DSLK_Don::taoNode(const SinhVien& sv) {
     NodeSinhVien* newNode = new NodeSinhVien;
     newNode->data = sv;
@@ -19,173 +17,177 @@ NodeSinhVien* DSLK_Don::taoNode(const SinhVien& sv) {
     return newNode;
 }
 
-// Thêm node vào đầu danh sách
+// Thêm đầu
 void DSLK_Don::themDau(const SinhVien& sv) {
     NodeSinhVien* newNode = taoNode(sv);
-    if (head == nullptr) {
-        head = newNode;
-    } else {
-        newNode->next = head;
-        head = newNode;
-    }
+    newNode->next = head;
+    head = newNode;
 }
 
-// Thêm node vào cuối danh sách
+// Thêm cuối
 void DSLK_Don::themCuoi(const SinhVien& sv) {
     NodeSinhVien* newNode = taoNode(sv);
+
     if (head == nullptr) {
         head = newNode;
-    } else {
-        NodeSinhVien* temp = head;
-        while (temp->next != nullptr) {
-            temp = temp->next;
-        }
-        temp->next = newNode;
+        return;
     }
+
+    NodeSinhVien* temp = head;
+    while (temp->next != nullptr)
+        temp = temp->next;
+
+    temp->next = newNode;
 }
 
-// Nhập nhiều sinh viên
+// Nhập danh sách (🔥 dùng hàm global)
 void DSLK_Don::nhapDanhSach() {
     int n;
-    cout << "Nhap so luong sinh vien can them: ";
+    cout << "Nhap so luong sinh vien: ";
     cin >> n;
-    for (int i = 0; i < n; ++i) {
-        cout << "--- Nhap thong tin sinh vien thu " << i + 1 << " ---" << endl;
-        SinhVien sv;
-        sv.nhapSinhVien(); 
+    cin.ignore();
+
+    for (int i = 0; i < n; i++) {
+        cout << "\nSinh vien thu " << i + 1 << ":\n";
+        SinhVien sv = nhapSinhVien(); // ✅ FIX
         themCuoi(sv);
     }
 }
 
-// In danh sách sinh viên
+// In danh sách (🔥 dùng hàm global)
 void DSLK_Don::inDanhSach() {
     if (head == nullptr) {
-        cout << "Danh sach sinh vien rong!" << endl;
+        cout << "Danh sach rong!\n";
         return;
     }
+
     NodeSinhVien* temp = head;
-    int count = 1;
+    int i = 1;
+
     while (temp != nullptr) {
-        cout << "Sinh vien " << count++ << ":" << endl;
-        temp->data.inSinhVien(); 
-        cout << "----------------------" << endl;
+        cout << "\nSinh vien " << i++ << ":\n";
+        inSinhVien(temp->data); // ✅ FIX
         temp = temp->next;
     }
 }
 
-// Xóa sinh viên theo mã
+// Xóa theo mã
 void DSLK_Don::xoaTheoMa(const string& maSV) {
     if (head == nullptr) {
-        cout << "Danh sach rong, khong the xoa!" << endl;
+        cout << "Danh sach rong!\n";
         return;
     }
 
-    // Nếu sinh viên cần xóa nằm ở đầu danh sách
     if (head->data.maSV == maSV) {
         NodeSinhVien* temp = head;
         head = head->next;
         delete temp;
-        cout << "Da xoa sinh vien co ma: " << maSV << endl;
+        cout << "Da xoa!\n";
         return;
     }
 
-    // Tìm sinh viên trong danh sách
-    NodeSinhVien* current = head;
-    NodeSinhVien* previous = nullptr;
+    NodeSinhVien* prev = head;
+    NodeSinhVien* curr = head->next;
 
-    while (current != nullptr && current->data.maSV != maSV) {
-        previous = current;
-        current = current->next;
+    while (curr != nullptr && curr->data.maSV != maSV) {
+        prev = curr;
+        curr = curr->next;
     }
 
-    // Nếu không tìm thấy
-    if (current == nullptr) {
-        cout << "Khong tim thay sinh vien co ma: " << maSV << endl;
+    if (curr == nullptr) {
+        cout << "Khong tim thay!\n";
         return;
     }
 
-    // Thực hiện xóa
-    previous->next = current->next;
-    delete current;
-    cout << "Da xoa sinh vien co ma: " << maSV << endl;
+    prev->next = curr->next;
+    delete curr;
+    cout << "Da xoa!\n";
 }
 
-// Tìm sinh viên theo tên
+// Tìm theo tên
 NodeSinhVien* DSLK_Don::timTheoTen(const string& tenSV) {
     NodeSinhVien* temp = head;
+
     while (temp != nullptr) {
-        if (temp->data.tenSV == tenSV) {
-            return temp; // Trả về con trỏ tới Node tìm thấy
-        }
+        if (temp->data.tenSV == tenSV)
+            return temp;
         temp = temp->next;
     }
-    return nullptr; // Không tìm thấy
+
+    return nullptr;
 }
 
-// Sắp xếp danh sách theo học phí (Tăng dần - Thuật toán Interchange Sort)
+// Sắp xếp
 void DSLK_Don::sapXepTheoHocPhi() {
-    if (head == nullptr || head->next == nullptr) {
-        return; // Danh sách rỗng hoặc chỉ có 1 phần tử thì không cần sắp xếp
-    }
-
     for (NodeSinhVien* i = head; i != nullptr; i = i->next) {
         for (NodeSinhVien* j = i->next; j != nullptr; j = j->next) {
             if (i->data.hocPhi > j->data.hocPhi) {
-                // Hoán đổi data (SinhVien) giữa 2 node
-                SinhVien temp = i->data;
-                i->data = j->data;
-                j->data = temp;
+                swap(i->data, j->data);
             }
         }
     }
-    cout << "Da sap xep danh sach tang dan theo hoc phi." << endl;
+    cout << "Da sap xep!\n";
 }
 
-// Lưu danh sách vào file
+// Lưu file
 void DSLK_Don::luuFile(const string& filename) {
-    ofstream outFile(filename);
-    if (!outFile.is_open()) {
-        cout << "Loi: Khong the mo file de ghi!" << endl;
+    ofstream out(filename);
+
+    if (!out.is_open()) {
+        cout << "Loi mo file!\n";
         return;
     }
 
     NodeSinhVien* temp = head;
+
     while (temp != nullptr) {
-        // Cần đảm bảo SinhVien có thể ghi vào file, 
-        // ví dụ nạp chồng toán tử << hoặc gọi hàm luuThongTin(outFile)
-        // ví dụ ghi từng thuộc tính (cần điều chỉnh theo SinhVien.h)
-        outFile << temp->data.maSV << ","
-                << temp->data.tenSV << ","
-                << temp->data.hocPhi << endl;
+        out << temp->data.maSV << "|"
+            << temp->data.tenSV << "|"
+            << temp->data.hocPhi << endl;
         temp = temp->next;
     }
-    outFile.close();
-    cout << "Da luu danh sach vao file: " << filename << endl;
+
+    out.close();
+    cout << "Luu file thanh cong!\n";
 }
 
-// Đọc danh sách từ file
+// Đọc file
 void DSLK_Don::docFile(const string& filename) {
-    ifstream inFile(filename);
-    if (!inFile.is_open()) {
-        cout << "Loi: Khong the mo file de doc!" << endl;
+    ifstream in(filename);
+
+    if (!in.is_open()) {
+        cout << "Loi mo file!\n";
         return;
     }
 
-    // Cần xóa danh sách cũ trước khi đọc (nếu có)
-    // while (head != nullptr) { xoaDau(); }
+    clear();
 
     string ma, ten;
-    double hocPhi; 
-    
-    // Code dưới demo logic đọc file
-    /*
-    while (getline(inFile, ma, ',') && getline(inFile, ten, ',') && inFile >> hocPhi) {
-        inFile.ignore(); // Bỏ qua ký tự newline
-        SinhVien sv(ma, ten, hocPhi); // Giả sử constructor hỗ trợ
+    float hocPhi;
+
+    while (getline(in, ma, '|') &&
+           getline(in, ten, '|') &&
+           in >> hocPhi) {
+
+        in.ignore();
+
+        SinhVien sv;
+        sv.maSV = ma;
+        sv.tenSV = ten;
+        sv.hocPhi = hocPhi;
+
         themCuoi(sv);
     }
-    */
-    
-    inFile.close();
-    cout << "Da doc danh sach tu file: " << filename << endl;
+
+    in.close();
+    cout << "Doc file thanh cong!\n";
+}
+
+// Xóa toàn bộ
+void DSLK_Don::clear() {
+    while (head != nullptr) {
+        NodeSinhVien* temp = head;
+        head = head->next;
+        delete temp;
+    }
 }

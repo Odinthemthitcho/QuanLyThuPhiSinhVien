@@ -24,5 +24,7 @@ public:
     void sapXepTheoHocPhi();
     void luuFile(const string& filename);
     void docFile(const string& filename);
+    void clear();
 };
 
+#endif

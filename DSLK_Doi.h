@@ -2,6 +2,8 @@
 #define DSLK_DOI_H
 
 #include "HoaDon.h"
+#include <string>
+using namespace std;
 
 struct NodeHoaDon {
     HoaDon data;
@@ -11,33 +13,27 @@ struct NodeHoaDon {
 
 class DSLK_Doi {
 private:
-    NodeHoaDon* head; // đầu danh sách
-    NodeHoaDon* tail; // cuối danh sách
+    NodeHoaDon* head; 
+    NodeHoaDon* tail; 
 
 public:
-    void init(); // Khởi tạo danh sách rỗng
-
-    // Thêm node vào đầu
+    void init(); 
+  
     void themDau(const HoaDon& hd);
 
-    // Thêm node vào cuối
     void themCuoi(const HoaDon& hd);
 
-    // In toàn bộ danh sách
     void inDanhSach();
 
-    // Xóa node theo mã hóa đơn
     void xoaNode(const string& maHD);
 
-    // Sửa node theo mã hóa đơn
     void suaNode(const string& maHD);
 
-    // Tìm node theo mã hóa đơn
     NodeHoaDon* timTheoMa(const string& maHD);
 
-    // Lưu danh sách vào file
     void luuFile(const string& filename);
 
-    // Đọc danh sách từ file
     void docFile(const string& filename);
 };
+
+#endif

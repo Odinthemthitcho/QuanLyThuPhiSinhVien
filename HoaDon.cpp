@@ -1,42 +1,138 @@
 #include "HoaDon.h"
 #include <iostream>
 #include <fstream>
+#include <limits>
 using namespace std;
 
 // Nhập hóa đơn
 HoaDon nhapHoaDon() {
     HoaDon hd;
-    //Nhập maHD, maSV, ngayLap, soTien
+
+    cout << "Nhap ma hoa don: ";
+    getline(cin, hd.maHD);
+    while (hd.maHD.empty()) {
+        cout << "Ma hoa don khong duoc de trong. Nhap lai: ";
+        getline(cin, hd.maHD);
+    }
+
+    cout << "Nhap ma sinh vien: ";
+    getline(cin, hd.maSV);
+    while (hd.maSV.empty()) {
+        cout << "Ma sinh vien khong duoc de trong. Nhap lai: ";
+        getline(cin, hd.maSV);
+    }
+
+    cout << "Nhap ngay lap (dd/mm/yyyy): ";
+    getline(cin, hd.ngayLap);
+    while (hd.ngayLap.empty()) {
+        cout << "Ngay lap khong duoc de trong. Nhap lai: ";
+        getline(cin, hd.ngayLap);
+    }
+
+    cout << "Nhap so tien: ";
+    while (!(cin >> hd.soTien) || hd.soTien < 0) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "So tien khong hop le. Nhap lai: ";
+    }
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    hd.prev = nullptr;
+    hd.next = nullptr;
+
     return hd;
 }
 
 // In hóa đơn
 void inHoaDon(const HoaDon& hd) {
-    // In maHD, maSV, ngayLap, soTien
+    cout << "----------------------------" << endl;
+    cout << "Ma hoa don: " << hd.maHD << endl;
+    cout << "Ma sinh vien: " << hd.maSV << endl;
+    cout << "Ngay lap: " << hd.ngayLap << endl;
+    cout << "So tien: " << hd.soTien << endl;
+    cout << "----------------------------" << endl;
 }
 
-// Lưu danh sách hóa đơn vào file
+// Lưu file
 void luuFileHoaDon(HoaDon* head, const string& filename) {
-    //Duyệt danh sách, ghi vào file
+    ofstream fout(filename);
+    if (!fout.is_open()) {
+        cerr << "Loi: Khong the mo file!" << endl;
+        return;
+    }
 
-// Đọc danh sách hóa đơn từ file
+    for (HoaDon* p = head; p != nullptr; p = p->next) {
+        fout << p->maHD << "|"
+             << p->maSV << "|"
+             << p->ngayLap << "|"
+             << p->soTien << endl;
+    }
+
+    fout.close();
+}
+
+// Đọc file
 HoaDon* docFileHoaDon(const string& filename) {
-    // Đọc file, tạo linked list, trả về head
-    return nullptr;
+    ifstream fin(filename);
+    if (!fin.is_open()) {
+        cerr << "Loi: Khong the mo file!" << endl;
+        return nullptr;
+    }
+
+    HoaDon* head = nullptr;
+    HoaDon* tail = nullptr;
+
+    string maHD, maSV, ngayLap;
+    float soTien;
+
+    while (getline(fin, maHD, '|') &&
+           getline(fin, maSV, '|') &&
+           getline(fin, ngayLap, '|') &&
+           fin >> soTien) {
+
+        fin.ignore(); // bỏ newline
+
+        HoaDon* node = new HoaDon{maHD, maSV, ngayLap, soTien, nullptr, nullptr};
+
+        if (head == nullptr) {
+            head = tail = node;
+        } else {
+            tail->next = node;
+            node->prev = tail;
+            tail = node;
+        }
+    }
+
+    fin.close();
+    return head;
 }
 
-// Tìm hóa đơn theo mã
+// Tìm
 HoaDon* timTheoMaHD(HoaDon* head, const string& maHD) {
-    //  Duyệt danh sách, trả về node đầu tiên khớp
+    for (HoaDon* p = head; p != nullptr; p = p->next) {
+        if (p->maHD == maHD)
+            return p;
+    }
     return nullptr;
 }
 
-// Sửa hóa đơn theo mã
-void suaHoaDon(HoaDon* head, const string& maHD) {
-    // Duyệt danh sách, tìm node khớp maHD, sửa thông tin
-}
-
-// Xóa hóa đơn theo mã
+// Xóa
 void xoaHoaDon(HoaDon*& head, const string& maHD) {
-    //Duyệt danh sách, tìm node khớp maHD, xóa node đó
+    HoaDon* p = timTheoMaHD(head, maHD);
+
+    if (p == nullptr) {
+        cout << "Khong tim thay!" << endl;
+        return;
+    }
+
+    if (p->prev)
+        p->prev->next = p->next;
+    else
+        head = p->next;
+
+    if (p->next)
+        p->next->prev = p->prev;
+
+    delete p;
+    cout << "Da xoa thanh cong!" << endl;
 }

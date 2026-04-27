@@ -10,13 +10,17 @@ struct StackNode {
 
 class Stack {
 private:
-    StackNode* top; // Node đỉnh của stack
+    StackNode* top; 
 
 public:
-    void init(); // Khởi tạo stack rỗng
-    void push(const HoaDon& hd); // Thêm hóa đơn lên stack
-    HoaDon pop(); // Lấy hóa đơn từ stack
-    int demStack(); // Đếm số node trong stack
-    StackNode* timStack(const string& maHD); // Tìm node theo mã hóa đơn
+    void init();
+    bool isEmpty(); 
+    void push(const HoaDon& hd);
+    HoaDon pop();
+    int demStack();
+    StackNode* timStack(const string& maHD);
+    void inStack(); 
+    void clear();
 };
 
+#endif

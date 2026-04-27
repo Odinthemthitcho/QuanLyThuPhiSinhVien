@@ -10,13 +10,16 @@ struct QueueNode {
 
 class Queue {
 private:
-    QueueNode* front; // đầu hàng đợi
-    QueueNode* rear;  // cuối hàng đợi
+    QueueNode* front;
+    QueueNode* rear;
 
 public:
-    void init(); // Khởi tạo hàng đợi rỗng
-    void enqueue(const SinhVien& sv); // Thêm sinh viên vào cuối queue
-    SinhVien dequeue(); // Lấy sinh viên từ đầu queue
-    void inQueue(); // In danh sách sinh viên trong queue
+    void init();
+    bool isEmpty();
+    void enqueue(const SinhVien& sv);
+    SinhVien dequeue();
+    void inQueue();
+    void clear(); 
 };
 
+#endif
